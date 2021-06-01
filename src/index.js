@@ -156,9 +156,14 @@ class ServerlessAWSDocumentation {
       const cfModelCreator = this.createCfModel(restApiId);
 
       // Add model resources
-      const models = this.customVars.documentation.models.map(cfModelCreator)
-        .reduce((modelObj, model) => {
+      const modelsArray = this.customVars.documentation.models.map(cfModelCreator);
+      const models = modelsArray
+        .reduce((modelObj, model, i) => {
           modelObj[`${model.Properties.Name}Model`] = model;
+          // Force to deploy models in sequence
+          if(i){
+            model.DependsOn = `${modelsArray[i-1].Properties.Name}Model`
+          }
           return modelObj;
         }, {});
       Object.assign(this.cfTemplate.Resources, models);
