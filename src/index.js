@@ -4,6 +4,7 @@ const models = require('./models');
 const swagger = require('./swagger');
 const fs = require('fs');
 const downloadDocumentation = require('./downloadDocumentation');
+const _ = require('lodash')
 
 class ServerlessAWSDocumentation {
   constructor(serverless, options) {
@@ -157,7 +158,7 @@ class ServerlessAWSDocumentation {
 
       // Add model resources
       const modelsArray = this.customVars.documentation.models.map(cfModelCreator);
-      const models = modelsArray
+      const models = _.uniqBy(modelsArray, model => model.Properties.Name)
         .reduce((modelObj, model, i) => {
           modelObj[`${model.Properties.Name}Model`] = model;
           // Force to deploy models in sequence
